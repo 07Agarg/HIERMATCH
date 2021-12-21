@@ -26,7 +26,6 @@ import wandb
 from cifar100_get_tree_target_3 import *
 
 from utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
-from tensorboardX import SummaryWriter
 
 parser = argparse.ArgumentParser(description='PyTorch MixMatch Training')
 # Optimization options
@@ -77,7 +76,6 @@ np.random.seed(RANDOM_SEED)
 torch.manual_seed(RANDOM_SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
-
 torch.cuda.manual_seed_all(RANDOM_SEED)
 os.environ["PYTHONHASHSEED"] = str(RANDOM_SEED)
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
@@ -167,7 +165,6 @@ def main():
 
     cudnn.benchmark = True
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
-    
 
     train_criterion = SemiLoss()
     criterion = nn.CrossEntropyLoss()
@@ -194,7 +191,6 @@ def main():
         logger = Logger(os.path.join(args.out, 'log.txt'), title=title)
         logger.set_names(['Train Loss', 'Train Loss X', 'Train Loss U',  'Valid Loss', 'Valid Acc.', 'Test Loss', 'Test Acc.'])
 
-    writer = SummaryWriter(args.out)
     step = 0
     test_accs = []
     # Train and val
@@ -204,20 +200,12 @@ def main():
 
         print('\nEpoch: [%d | %d] LR: %f' % (epoch + 1, args.epochs, state['lr']))
 
-        train_loss, train_loss_x, train_loss_u = train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_optimizer, train_criterion, epoch, use_cuda, writer, n_classes, scaler)
+        train_loss, train_loss_x, train_loss_u = train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_optimizer, train_criterion, epoch, use_cuda, n_classes, scaler)
         _, train_acc = validate(labeled_trainloader, ema_model, criterion, epoch, use_cuda, mode='Train Stats')
         val_loss, val_acc = validate(val_loader, ema_model, criterion, epoch, use_cuda, mode='Valid Stats')
         test_loss, test_acc = validate(test_loader, ema_model, criterion, epoch, use_cuda, mode='Test Stats ')
 
         step = args.train_iteration * (epoch + 1)
-
-        writer.add_scalar('losses/train_loss', train_loss, step)
-        writer.add_scalar('losses/valid_loss', val_loss, step)
-        writer.add_scalar('losses/test_loss', test_loss, step)
-
-        writer.add_scalar('accuracy/train_acc', train_acc, step)
-        writer.add_scalar('accuracy/val_acc', val_acc, step)
-        writer.add_scalar('accuracy/test_acc', test_acc, step)
         
         wandb.log({
             'train loss' : train_loss,
@@ -244,7 +232,6 @@ def main():
             }, is_best)
         test_accs.append(test_acc)
     logger.close()
-    writer.close()
 
     print('Best acc:')
     print(best_acc)
@@ -253,7 +240,7 @@ def main():
     print(np.mean(test_accs[-20:]))
 
 
-def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_optimizer, criterion, epoch, use_cuda, writer, n_classes, scaler):
+def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_optimizer, criterion, epoch, use_cuda, n_classes, scaler):
     
 
     batch_time = AverageMeter()
@@ -358,7 +345,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_opti
                 for i in range(len(n_classes)):
                     print(f'Sum {i+1} -> {Lxs[i] + ws[i] * Lus[i]}')
 
-        writer.add_scalar('Unlabeled_loss_weight_lambda', ws[0], epoch)
+
 
         # record loss
         losses.update(loss.item(), inputs_x.size(0))
@@ -368,6 +355,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_opti
             losses_u.update(Lus[i].item(), inputs_x.size(0))
             _ws.update(ws[i], inputs_x.size(0))
 
+        # compute gradient and do SGD step
         optimizer.zero_grad()
         
         if args.mix_precision:
@@ -377,7 +365,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, ema_opti
         else:
             loss.backward()
             optimizer.step()
-        
+
         ema_optimizer.step()
 
         # measure elapsed time
