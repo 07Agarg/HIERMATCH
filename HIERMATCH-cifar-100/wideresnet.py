@@ -88,7 +88,7 @@ class WideResNet(nn.Module):
 #         return self.fc(out)
 
 class model_bn_2(nn.Module):
-    def __init__(self, model, feature_size=512, classes=100):
+    def __init__(self, model, feature_size=512, classes=[100, 20]):
 
         super(model_bn_2, self).__init__() 
 
@@ -123,7 +123,6 @@ class model_bn_3(nn.Module):
     def __init__(self, model, feature_size=512, classes=[100, 20, 8]):
 
         super(model_bn_3, self).__init__() 
-        import pdb; pdb.set_trace()
         self.features_2 =  model
         
         val = feature_size // 3
