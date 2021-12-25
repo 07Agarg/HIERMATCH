@@ -23,7 +23,7 @@ HIERMATCH approach is tested on **CIFAR-100** and **North American Birds** Datas
   - With samples from finest-grained level only and no additional samples from coarser-levels, use the code folder in ```HIERMATCH-nabirds/```
   - With samples from finest-grained level and partial-labeled samples from coarser-levels, use the code folder in ```HIERMATCH-nabirds-partial/```.
 
-+use the command in the respective folders: ```python train.py```
+Use the command in the respective folders: ```python train.py```
 
 ## Installation
 Clone the repository
