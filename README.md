@@ -12,6 +12,13 @@ If you find this paper useful, please cite our paper:
   <img src="imgs/HIERMATCH_approach.png"/>
 </div>
 
+## Installation
+Clone the repository
+```
+$ git clone https://github.com/07Agarg/HIERMATCH
+$ cd HIERMATCH
+```
+
 ## Using the Code
 HIERMATCH approach is tested on **CIFAR-100** and **North American Birds** Dataset. <br/>
 
@@ -24,13 +31,6 @@ HIERMATCH approach is tested on **CIFAR-100** and **North American Birds** Datas
   - With samples from finest-grained level and partial-labeled samples from coarser-levels, use the code folder in ```HIERMATCH-nabirds-partial/```.
 
 Use the command in the respective folders: ```python train.py```
-
-## Installation
-Clone the repository
-```
-$ git clone https://github.com/07Agarg/HIERMATCH
-$ cd HIERMATCH
-```
 
 ## Acknowledgements
 The codebase is borrowed from [MixMatch](https://github.com/YU1ut/MixMatch-pytorch)
