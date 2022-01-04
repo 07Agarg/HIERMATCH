@@ -6,6 +6,16 @@ _IEEE Winter Conference on Applications of Computer Vision (WACV 2022)_ <br/>
 
 ## Citations
 If you find this paper useful, please cite our paper: 
+```
+@InProceedings{Garg_2022_WACV,
+    author    = {Garg, Ashima and Bagga, Shaurya and Singh, Yashvardhan and Anand, Saket},
+    title     = {HierMatch: Leveraging Label Hierarchies for Improving Semi-Supervised Learning},
+    booktitle = {Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
+    month     = {January},
+    year      = {2022},
+    pages     = {1015-1024}
+}
+```
 
 ## Proposed HIERMATCH
 <div align="center">
